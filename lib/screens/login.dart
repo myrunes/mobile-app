@@ -1,15 +1,13 @@
 import 'package:app/api/api.dart';
 import 'package:app/api/models.dart';
-import 'package:app/models/login.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
 class LoginBody extends StatelessWidget {
-  final LoginModel loginState;
   final API api;
 
-  LoginBody(this.loginState, this.api);
+  LoginBody(this.api);
 
   final _formKey = GlobalKey<FormState>();
   final _loginFormData = LoginFormModel();
@@ -47,8 +45,8 @@ class LoginBody extends StatelessWidget {
                 onPressed: () {
                   final FormState state = _formKey.currentState;
                   state.save();
-                  api.login(_loginFormData).then((res) {
-                    print(res);
+                  api.login(_loginFormData).then((_) {
+                    Navigator.pushNamed(context, '/');
                   }, onError: (err) {
                     var errTxt = 'An unknown error occured';
                     if (err is APIError) {
@@ -56,7 +54,7 @@ class LoginBody extends StatelessWidget {
                           'Invalid username or password.' : 
                           'Login failed: ${err.reason}';
                     } else {
-                      errTxt = (err as Exception).toString();
+                      errTxt = err.toString();
                       print(err);
                     }
                     Scaffold.of(context).showSnackBar(SnackBar(
@@ -77,11 +75,10 @@ class LoginBody extends StatelessWidget {
 class LoginPage extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
-    final loginState = Provider.of<LoginModel>(context);
     final api = Provider.of<API>(context);
 
     return Scaffold(
-      body: LoginBody(loginState, api),
+      body: LoginBody(api),
     );
   }
 }
