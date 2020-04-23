@@ -1,6 +1,8 @@
 import 'models.dart';
 
 class LoginFormModel implements Mapable {
+  LoginFormModel({this.username, this.password, this.remember});
+
   String username;
   String password;
   bool remember;

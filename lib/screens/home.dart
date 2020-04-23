@@ -2,6 +2,7 @@ import 'package:app/api/api.dart';
 import 'package:app/api/models.dart';
 import 'package:app/widgets/pagetile.dart';
 import 'package:flutter/material.dart';
+import 'package:liquid_pull_to_refresh/liquid_pull_to_refresh.dart';
 
 class HomePage extends StatefulWidget {
   HomePage({Key key, this.title, this.apiInstance}) : super(key: key);
@@ -14,16 +15,28 @@ class HomePage extends StatefulWidget {
 }
 
 class _HomePageContent extends StatelessWidget {
-  _HomePageContent(this.pages);
+  _HomePageContent({this.pages, this.onRefresh});
 
   final List<PageModel> pages;
+  final Future<void> Function() onRefresh;
 
   @override
   Widget build(BuildContext context) {
-    final pageWidgets = pages.map((e) => PageTile(e)).toList();
+    final pageWidgets = <Widget>[
+      Container(
+        height: 10,
+      )
+    ];
+    pageWidgets.addAll(pages.map((e) => PageTile(e)).toList());
+
     return Container(
-      child: ListView(
-        children: pageWidgets,
+      child: LiquidPullToRefresh(
+        springAnimationDurationInMilliseconds: 400,
+        showChildOpacityTransition: false,
+        onRefresh: onRefresh,
+        child: ListView(
+          children: pageWidgets,
+        ),
       ),
     );
   }
@@ -39,7 +52,7 @@ class _HomePageState extends State<HomePage> {
   void initState() {
     apiInstance.getMe().then((_) {
       _fetchData();
-    }).catchError((err) {
+    }, onError: (err) {
       if (err is APIError && err.statusCode == 401)
         Navigator.pushReplacementNamed(context, '/login');
     });
@@ -67,7 +80,12 @@ class _HomePageState extends State<HomePage> {
           ],
         ),
       ),
-      body: _HomePageContent(pages),
+      body: _HomePageContent(
+        pages: pages,
+        onRefresh: () async {
+          await _fetchData();
+        },
+      ),
       floatingActionButton: FloatingActionButton(
         onPressed: () {},
         tooltip: 'Increment',
@@ -76,7 +94,7 @@ class _HomePageState extends State<HomePage> {
     );
   }
 
-  void _fetchData() async {
+  Future<void> _fetchData() async {
     var pList = await apiInstance.getPages();
     setState(() {
       pages = pList.data;

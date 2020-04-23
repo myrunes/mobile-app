@@ -3,12 +3,22 @@ import 'package:app/api/forms.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 
-class LoginBody extends StatelessWidget {
-  LoginBody(this.api);
+class LoginBody extends StatefulWidget {
+  LoginBody(this.apiInstance);
 
-  final API api;
+  final API apiInstance;
+
+  @override
+  State<StatefulWidget> createState() => _LoginBody(apiInstance);
+}
+
+class _LoginBody extends State<LoginBody> {
+  _LoginBody(this.apiInstance);
+
+  final API apiInstance;
   final _formKey = GlobalKey<FormState>();
   final _loginFormData = LoginFormModel();
+  bool _remember = false;
 
   @override
   Widget build(BuildContext context) {
@@ -49,6 +59,14 @@ class LoginBody extends StatelessWidget {
                         val.length > 0 ? null : 'Invalid password',
                     onSaved: (val) => _loginFormData.password = val,
                   ),
+                  SwitchListTile(
+                    activeColor: Colors.pink,
+                    title: Text('Remember'),
+                    value: _remember,
+                    onChanged: (v) => setState(() {
+                      _remember = v;
+                    }),
+                  ),
                 ],
               ),
             ),
@@ -57,7 +75,11 @@ class LoginBody extends StatelessWidget {
               onPressed: () {
                 final FormState state = _formKey.currentState;
                 state.save();
-                api.login(_loginFormData).then((_) {
+                final loginForm = LoginFormModel(
+                    username: _loginFormData.username,
+                    password: _loginFormData.password,
+                    remember: _remember);
+                apiInstance.login(loginForm).then((_) {
                   Navigator.pushReplacementNamed(context, '/');
                 }, onError: (err) {
                   var errTxt = 'An unknown error occured';
@@ -75,7 +97,7 @@ class LoginBody extends StatelessWidget {
                   ));
                 });
               },
-            )
+            ),
           ],
         ),
       ),

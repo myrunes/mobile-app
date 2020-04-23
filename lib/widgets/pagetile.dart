@@ -11,7 +11,7 @@ class PageTile extends StatelessWidget {
     return Container(
       // width: double.infinity,
       padding: EdgeInsets.all(10),
-      margin: EdgeInsets.fromLTRB(10, 10, 10, 0),
+      margin: EdgeInsets.fromLTRB(10, 0, 10, 10),
       decoration: BoxDecoration(
         color: Color.fromRGBO(0, 0, 0, 0.15),
         borderRadius: BorderRadius.circular(5),
@@ -75,5 +75,9 @@ Color _treeColor(String tree) {
       return Color.fromRGBO(251, 193, 45, 0.25);
     case 'sorcery':
       return Color.fromRGBO(2, 137, 209, 0.25);
+    case 'resolve':
+      return Color.fromRGBO(104, 159, 56, 0.25);
+    default:
+      return null;
   }
 }
