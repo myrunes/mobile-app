@@ -1,12 +1,13 @@
 import 'dart:convert';
-import 'package:flutter/cupertino.dart';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'package:http/http.dart';
 import 'package:http/http.dart' as http;
 
+import 'forms.dart';
 import 'models.dart';
 
 const SECURE_STORAGE_TOKEN_KEY = 'myrunes_api_token';
+const COOKIE_TOKEN_KEY = 'jwt_token=';
 
 class APIError {
   String reason;
@@ -35,6 +36,9 @@ class API {
   }
 
   Future _setToken(String token) {
+    if (token == null) {
+      return _storage.delete(key: SECURE_STORAGE_TOKEN_KEY);
+    }
     return _storage.write(key: SECURE_STORAGE_TOKEN_KEY, value: token);
   }
 
@@ -53,21 +57,19 @@ class API {
   }
 
   Uri _getUri(String path, [Map<String, dynamic> query]) {
-    if (prefix != null)
-      path = '$prefix/$path';
-      
-    return https 
-      ? Uri.https(baseURL, path, query) 
-      : Uri.http(baseURL, path, query);
+    if (prefix != null) path = '$prefix/$path';
+
+    return https
+        ? Uri.https(baseURL, path, query)
+        : Uri.http(baseURL, path, query);
   }
 
-  Future<Response> _post(String path, Mapable body, [Map<String, dynamic> query]) async {
-    var res = await http.post(
-      _getUri(path, query),
-      headers: await _getHeaders(),
-      body: json.encode(body.toMap()), 
-      encoding: Encoding.getByName('application/json')
-    );
+  Future<Response> _post(String path,
+      {Mapable body, Map<String, dynamic> query}) async {
+    var res = await http.post(_getUri(path, query),
+        headers: await _getHeaders(),
+        body: body != null ? json.encode(body.toMap()) : null,
+        encoding: Encoding.getByName('application/json'));
 
     if (res.statusCode >= 400) {
       throw APIError(res);
@@ -90,15 +92,18 @@ class API {
   }
 
   Future login(LoginFormModel m) async {
-    const COOKIE_TOKEN_KEY = 'jwt_token=';
-
-    final res = await _post('/login', m);
+    final res = await _post('/login', body: m);
     final cookieHeader = res.headers['set-cookie'];
     final tokenStart = cookieHeader.indexOf(COOKIE_TOKEN_KEY);
     final tokenEnd = cookieHeader.indexOf(';', tokenStart);
     final token = cookieHeader.substring(tokenStart, tokenEnd);
 
     await _setToken(token);
+  }
+
+  Future logout() async {
+    await _post('/logout');
+    _setToken(null);
   }
 
   Future<UserModel> getMe() async {
@@ -110,7 +115,7 @@ class API {
     final res = await _get('/pages');
     final data = json.decode(res.body);
     final n = data['n'] ?? 0;
-    
+
     List<PageModel> d = List();
 
     if (data['data'] != null) {

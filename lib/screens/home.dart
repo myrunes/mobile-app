@@ -21,9 +21,8 @@ class _HomePageContent extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final pageWidgets = pages.map((e) => PageTile(e)).toList();
-    return Center(
-      child: Column(
-        mainAxisAlignment: MainAxisAlignment.center,
+    return Container(
+      child: ListView(
         children: pageWidgets,
       ),
     );
@@ -38,14 +37,12 @@ class _HomePageState extends State<HomePage> {
 
   @override
   void initState() {
-    apiInstance.getMe()
-      .then((_) {
-        _fetchData();
-      })
-      .catchError((err) {
-        if (err is APIError && err.statusCode == 401)
-          Navigator.pushNamed(context, '/login');
-      });
+    apiInstance.getMe().then((_) {
+      _fetchData();
+    }).catchError((err) {
+      if (err is APIError && err.statusCode == 401)
+        Navigator.pushReplacementNamed(context, '/login');
+    });
     super.initState();
   }
 
@@ -54,7 +51,21 @@ class _HomePageState extends State<HomePage> {
     return Scaffold(
       appBar: AppBar(
         title: Text(widget.title),
-        automaticallyImplyLeading: false,
+      ),
+      drawer: Drawer(
+        child: ListView(
+          children: [
+            ListTile(leading: Icon(Icons.settings), title: Text('Settings')),
+            ListTile(
+              leading: Icon(Icons.exit_to_app),
+              title: Text('Logout'),
+              onTap: () async {
+                await apiInstance.logout();
+                Navigator.pushReplacementNamed(context, '/login');
+              },
+            ),
+          ],
+        ),
       ),
       body: _HomePageContent(pages),
       floatingActionButton: FloatingActionButton(

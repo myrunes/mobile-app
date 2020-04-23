@@ -6,9 +6,9 @@ class ErrorResponse {
   final String message;
   final int code;
 
-  ErrorResponse.fromJson(Map<String, dynamic> json) 
-    : message = json['message'], 
-      code = json['code'];
+  ErrorResponse.fromJson(Map<String, dynamic> json)
+      : message = json['message'],
+        code = json['code'];
 }
 
 class ListResponse<T> {
@@ -16,19 +16,6 @@ class ListResponse<T> {
 
   final int n;
   final List<T> data;
-}
-
-class LoginFormModel implements Mapable {
-  String username;
-  String password;
-
-  @override
-  Map<String, dynamic> toMap() {
-    return <String, dynamic> {
-      'username': username,
-      'password': password,
-    };
-  }
 }
 
 class UserModel implements Mapable {
@@ -54,14 +41,14 @@ class UserModel implements Mapable {
 
     if (json['pageorder'] != null) {
       pageorder = (json['pageorder'] as Map<String, dynamic>)
-        .map<String, List<String>>((k, v) =>
-          MapEntry(k, (v as List<dynamic>).map<String>((lv) => lv as String).toList()));
+          .map<String, List<String>>((k, v) => MapEntry(k,
+              (v as List<dynamic>).map<String>((lv) => lv as String).toList()));
     }
   }
 
   @override
   Map<String, dynamic> toMap() {
-    return <String, dynamic> {
+    return <String, dynamic>{
       'uid': uid,
       'username': username,
       'mailaddress': mailaddress,
@@ -85,7 +72,7 @@ class TreeModel implements Mapable {
 
   @override
   Map<String, dynamic> toMap() {
-    return <String, dynamic> {
+    return <String, dynamic>{
       'tree': tree,
       'rows': rows,
     };
@@ -101,7 +88,7 @@ class PerksModel implements Mapable {
 
   @override
   Map<String, dynamic> toMap() {
-    return <String, dynamic> {
+    return <String, dynamic>{
       'rows': rows,
     };
   }
@@ -135,26 +122,21 @@ class PageModel implements Mapable {
 
   @override
   Map<String, dynamic> toMap() {
-    return <String, dynamic> {
+    return <String, dynamic>{
       'uid': uid,
       'owner': owner,
       'title': title,
       'created': created,
       'edited': edited,
       'champions': champions,
-      
       'primary': primary.toMap(),
       'secondary': secondary.toMap(),
       'perks': perks.toMap(),
     };
   }
-
 }
 
 List<T> _asList<T>(List<dynamic> list) {
-  if (list == null)
-    return List<T>();
-  return list
-    .map((e) => e as T)
-    .toList();
+  if (list == null) return List<T>();
+  return list.map((e) => e as T).toList();
 }
