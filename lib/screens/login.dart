@@ -1,5 +1,5 @@
-import 'package:app/api/api.dart';
-import 'package:app/api/forms.dart';
+import 'package:myrunes/api/api.dart';
+import 'package:myrunes/api/forms.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 

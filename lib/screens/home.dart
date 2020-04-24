@@ -1,8 +1,9 @@
-import 'package:app/api/api.dart';
-import 'package:app/api/models.dart';
-import 'package:app/widgets/pagetile.dart';
+import 'package:myrunes/api/api.dart';
+import 'package:myrunes/api/models.dart';
+import 'package:myrunes/widgets/pagetile.dart';
 import 'package:flutter/material.dart';
 import 'package:liquid_pull_to_refresh/liquid_pull_to_refresh.dart';
+import 'package:package_info/package_info.dart';
 
 class HomePage extends StatefulWidget {
   HomePage({Key key, this.title, this.apiInstance}) : super(key: key);
@@ -46,7 +47,8 @@ class _HomePageState extends State<HomePage> {
   _HomePageState(this.apiInstance);
 
   final API apiInstance;
-  List<PageModel> pages = List();
+  List<PageModel> _pages = List();
+  PackageInfo _packInfo;
 
   @override
   void initState() {
@@ -56,6 +58,8 @@ class _HomePageState extends State<HomePage> {
       if (err is APIError && err.statusCode == 401)
         Navigator.pushReplacementNamed(context, '/login');
     });
+
+    _fetchPackageInfo();
     super.initState();
   }
 
@@ -68,6 +72,22 @@ class _HomePageState extends State<HomePage> {
       drawer: Drawer(
         child: ListView(
           children: [
+            Container(
+              height: 85,
+              child: DrawerHeader(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(
+                      'MYRUNES',
+                      style: TextStyle(fontSize: 25),
+                    ),
+                    Text('version ${_packInfo?.version}')
+                  ],
+                ),
+                decoration: BoxDecoration(color: Colors.pink),
+              ),
+            ),
             ListTile(leading: Icon(Icons.settings), title: Text('Settings')),
             ListTile(
               leading: Icon(Icons.exit_to_app),
@@ -81,7 +101,7 @@ class _HomePageState extends State<HomePage> {
         ),
       ),
       body: _HomePageContent(
-        pages: pages,
+        pages: _pages,
         onRefresh: () async {
           await _fetchData();
         },
@@ -97,7 +117,14 @@ class _HomePageState extends State<HomePage> {
   Future<void> _fetchData() async {
     var pList = await apiInstance.getPages();
     setState(() {
-      pages = pList.data;
+      _pages = pList.data;
+    });
+  }
+
+  Future<void> _fetchPackageInfo() async {
+    final info = await PackageInfo.fromPlatform();
+    setState(() {
+      _packInfo = info;
     });
   }
 }

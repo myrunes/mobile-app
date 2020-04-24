@@ -1,4 +1,4 @@
-import 'package:app/api/models.dart';
+import 'package:myrunes/api/models.dart';
 import 'package:flutter/cupertino.dart';
 
 class PageTile extends StatelessWidget {
@@ -36,17 +36,11 @@ class _TreeRow extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final runes = <Widget>[
-      Image(
-        width: 32,
-        image: AssetImage('assets/rune-avis/${tree.tree}.png'),
-      ),
+      _RuneImage(path: 'assets/rune-avis/${tree.tree}.png'),
     ];
 
     runes.addAll(tree.rows
-        .map((e) => Image(
-              width: 32,
-              image: AssetImage('assets/rune-avis/${tree.tree}/$e.png'),
-            ))
+        .map((e) => _RuneImage(path: 'assets/rune-avis/${tree.tree}/$e.png'))
         .toList());
 
     return Container(
@@ -61,6 +55,23 @@ class _TreeRow extends StatelessWidget {
           children: runes,
         ),
       ),
+    );
+  }
+}
+
+class _RuneImage extends StatelessWidget {
+  _RuneImage({this.path, this.height = 32, this.width = 32});
+
+  final String path;
+  final double height;
+  final double width;
+
+  @override
+  Widget build(BuildContext context) {
+    return Image(
+      width: width,
+      height: height,
+      image: AssetImage(path),
     );
   }
 }
