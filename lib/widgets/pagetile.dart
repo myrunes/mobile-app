@@ -19,11 +19,46 @@ class PageTile extends StatelessWidget {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Text(page.title),
+          _PageHeader(page),
           _TreeRow(page.primary),
           _TreeRow(page.secondary),
         ],
       ),
+    );
+  }
+}
+
+class _PageHeader extends StatelessWidget {
+  _PageHeader(this.page);
+
+  final PageModel page;
+
+  @override
+  Widget build(BuildContext context) {
+    final rowElements = <Widget>[
+      Container(
+        margin: EdgeInsets.only(right: 10),
+        child: Text(
+          page.title,
+          style: const TextStyle(fontSize: 16),
+        ),
+      ),
+    ];
+
+    rowElements.addAll(page.champions.map((e) => Container(
+          width: 16,
+          height: 16,
+          margin: EdgeInsets.only(right: 2),
+          decoration: BoxDecoration(
+              shape: BoxShape.circle,
+              image: DecorationImage(
+                image: AssetImage('assets/champ-avis/$e.png'),
+              )),
+        )));
+
+    return Container(
+      margin: EdgeInsets.only(bottom: 5),
+      child: Row(children: rowElements),
     );
   }
 }
@@ -45,7 +80,7 @@ class _TreeRow extends StatelessWidget {
 
     return Container(
       padding: EdgeInsets.all(5),
-      margin: EdgeInsets.only(top: 5),
+      margin: const EdgeInsets.only(top: 5),
       decoration: BoxDecoration(
         color: _treeColor(tree.tree),
         borderRadius: BorderRadius.circular(5),
@@ -60,18 +95,23 @@ class _TreeRow extends StatelessWidget {
 }
 
 class _RuneImage extends StatelessWidget {
-  _RuneImage({this.path, this.height = 32, this.width = 32});
+  _RuneImage(
+      {this.path, this.height = 32, this.width = 32, this.rightPadding = 3});
 
   final String path;
   final double height;
   final double width;
+  final double rightPadding;
 
   @override
   Widget build(BuildContext context) {
-    return Image(
-      width: width,
-      height: height,
-      image: AssetImage(path),
+    return Padding(
+      padding: EdgeInsets.only(right: rightPadding),
+      child: Image(
+        width: width,
+        height: height,
+        image: AssetImage(path),
+      ),
     );
   }
 }

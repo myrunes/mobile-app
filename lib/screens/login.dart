@@ -25,7 +25,7 @@ class _LoginBody extends State<LoginBody> {
     return Container(
         child: Center(
             child: Padding(
-      padding: EdgeInsets.symmetric(horizontal: 50),
+      padding: const EdgeInsets.symmetric(horizontal: 50),
       child: Form(
         key: _formKey,
         child: Column(
@@ -34,12 +34,12 @@ class _LoginBody extends State<LoginBody> {
           children: <Widget>[
             Text(
               'LOGIN',
-              style: TextStyle(
+              style: const TextStyle(
                 fontSize: 32,
               ),
             ),
             Padding(
-              padding: EdgeInsets.symmetric(vertical: 20),
+              padding: const EdgeInsets.symmetric(vertical: 20),
               child: Column(
                 children: [
                   TextFormField(
@@ -61,7 +61,7 @@ class _LoginBody extends State<LoginBody> {
                   ),
                   SwitchListTile(
                     activeColor: Colors.pink,
-                    title: Text('Remember'),
+                    title: const Text('Remember'),
                     value: _remember,
                     onChanged: (v) => setState(() {
                       _remember = v;

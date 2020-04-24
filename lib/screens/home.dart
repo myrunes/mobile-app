@@ -80,17 +80,18 @@ class _HomePageState extends State<HomePage> {
                   children: [
                     Text(
                       'MYRUNES',
-                      style: TextStyle(fontSize: 25),
+                      style: const TextStyle(fontSize: 25),
                     ),
                     Text('version ${_packInfo?.version}')
                   ],
                 ),
-                decoration: BoxDecoration(color: Colors.pink),
+                decoration: const BoxDecoration(color: Colors.pink),
               ),
             ),
-            ListTile(leading: Icon(Icons.settings), title: Text('Settings')),
             ListTile(
-              leading: Icon(Icons.exit_to_app),
+                leading: const Icon(Icons.settings), title: Text('Settings')),
+            ListTile(
+              leading: const Icon(Icons.exit_to_app),
               title: Text('Logout'),
               onTap: () async {
                 await apiInstance.logout();
@@ -109,7 +110,7 @@ class _HomePageState extends State<HomePage> {
       floatingActionButton: FloatingActionButton(
         onPressed: () {},
         tooltip: 'Increment',
-        child: Icon(Icons.add),
+        child: const Icon(Icons.add),
       ),
     );
   }
