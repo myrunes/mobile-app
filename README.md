@@ -29,6 +29,9 @@ $ flutter build apk --release
 
 The final APK is located in the `build/app/outputs/flutter-apk` directory. Either, you pull the APK directly onto your device and install it manually or run `flutter install` to install it by flutter.
 
+You can also download the [latest CI artifacts](https://github.com/myrunes/mobile-app/actions?query=workflow%3A%22Main+CI%22) containing a release APK. Just select the latest CI run, select the `build` job and download `Release Artifacts`.
+![](https://i.zekro.de/brave_6ripQxFim3.png)
+
 ---
 
 © 2020 Ringo Hoffmann (zekro Development)  
