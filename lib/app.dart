@@ -1,4 +1,5 @@
 import 'package:myrunes/api/api.dart';
+import 'package:myrunes/screens/editor.dart';
 import 'package:myrunes/screens/login.dart';
 import 'package:flutter/material.dart';
 import 'package:myrunes/screens/viewer.dart';
@@ -17,6 +18,7 @@ class App extends StatelessWidget {
             HomeScreen(title: 'MYRUNES', apiInstance: _apiInstance),
         '/login': (context) => LoginScreen(_apiInstance),
         '/pages/view': (context) => PageViewerScreen(_apiInstance),
+        '/pages/edit': (context) => PageEditorScreen(_apiInstance),
       },
       title: 'myrunes',
       theme: ThemeData(

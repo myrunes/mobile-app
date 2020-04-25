@@ -27,7 +27,19 @@ class _PageViewerScreenState extends State<PageViewerScreen> {
     _page = ModalRoute.of(context).settings.arguments;
 
     return Scaffold(
-        appBar: AppBar(title: Text(_page.title)),
+        appBar: AppBar(
+            title: Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                crossAxisAlignment: CrossAxisAlignment.center,
+                children: [
+              Text(_page.title),
+              IconButton(
+                icon: Icon(Icons.edit),
+                tooltip: 'Edit page',
+                onPressed: () => Navigator.pushNamed(context, '/pages/edit',
+                    arguments: _page),
+              )
+            ])),
         body: _PageViewerScreenContent(_page));
   }
 }
