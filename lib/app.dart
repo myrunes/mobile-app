@@ -1,6 +1,7 @@
 import 'package:myrunes/api/api.dart';
 import 'package:myrunes/screens/login.dart';
 import 'package:flutter/material.dart';
+import 'package:myrunes/screens/viewer.dart';
 import 'screens/home.dart';
 
 class App extends StatelessWidget {
@@ -12,8 +13,10 @@ class App extends StatelessWidget {
     return MaterialApp(
       initialRoute: '/',
       routes: {
-        '/': (context) => HomePage(title: 'MYRUNES', apiInstance: _apiInstance),
-        '/login': (context) => LoginPage(_apiInstance),
+        '/': (context) =>
+            HomeScreen(title: 'MYRUNES', apiInstance: _apiInstance),
+        '/login': (context) => LoginScreen(_apiInstance),
+        '/pages/view': (context) => PageViewerScreen(_apiInstance),
       },
       title: 'myrunes',
       theme: ThemeData(

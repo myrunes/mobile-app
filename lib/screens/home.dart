@@ -5,46 +5,18 @@ import 'package:flutter/material.dart';
 import 'package:liquid_pull_to_refresh/liquid_pull_to_refresh.dart';
 import 'package:package_info/package_info.dart';
 
-class HomePage extends StatefulWidget {
-  HomePage({Key key, this.title, this.apiInstance}) : super(key: key);
+class HomeScreen extends StatefulWidget {
+  HomeScreen({Key key, this.title, this.apiInstance}) : super(key: key);
 
   final String title;
   final API apiInstance;
 
   @override
-  _HomePageState createState() => _HomePageState(apiInstance);
+  _HomeScreenState createState() => _HomeScreenState(apiInstance);
 }
 
-class _HomePageContent extends StatelessWidget {
-  _HomePageContent({this.pages, this.onRefresh});
-
-  final List<PageModel> pages;
-  final Future<void> Function() onRefresh;
-
-  @override
-  Widget build(BuildContext context) {
-    final pageWidgets = <Widget>[
-      Container(
-        height: 10,
-      )
-    ];
-    pageWidgets.addAll(pages.map((e) => PageTile(e)).toList());
-
-    return Container(
-      child: LiquidPullToRefresh(
-        springAnimationDurationInMilliseconds: 400,
-        showChildOpacityTransition: false,
-        onRefresh: onRefresh,
-        child: ListView(
-          children: pageWidgets,
-        ),
-      ),
-    );
-  }
-}
-
-class _HomePageState extends State<HomePage> {
-  _HomePageState(this.apiInstance);
+class _HomeScreenState extends State<HomeScreen> {
+  _HomeScreenState(this.apiInstance);
 
   final API apiInstance;
   List<PageModel> _pages = List();
@@ -101,7 +73,7 @@ class _HomePageState extends State<HomePage> {
           ],
         ),
       ),
-      body: _HomePageContent(
+      body: _HomeScreenContent(
         pages: _pages,
         onRefresh: () async {
           await _fetchData();
@@ -127,5 +99,40 @@ class _HomePageState extends State<HomePage> {
     setState(() {
       _packInfo = info;
     });
+  }
+}
+
+class _HomeScreenContent extends StatelessWidget {
+  _HomeScreenContent({this.pages, this.onRefresh});
+
+  final List<PageModel> pages;
+  final Future<void> Function() onRefresh;
+
+  void _onPageTileTap(BuildContext context, PageModel page) {
+    Navigator.pushNamed(context, '/pages/view', arguments: page);
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    final pageWidgets = <Widget>[
+      Container(
+        height: 10,
+      )
+    ];
+    pageWidgets.addAll(pages
+        .map((e) => GestureDetector(
+            child: PageTile(e), onTap: () => _onPageTileTap(context, e)))
+        .toList());
+
+    return Container(
+      child: LiquidPullToRefresh(
+        springAnimationDurationInMilliseconds: 400,
+        showChildOpacityTransition: false,
+        onRefresh: onRefresh,
+        child: ListView(
+          children: pageWidgets,
+        ),
+      ),
+    );
   }
 }

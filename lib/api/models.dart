@@ -62,6 +62,8 @@ class UserModel implements Mapable {
 }
 
 class TreeModel implements Mapable {
+  TreeModel({this.tree, this.rows});
+
   String tree;
   List<String> rows;
 
