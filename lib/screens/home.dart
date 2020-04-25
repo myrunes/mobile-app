@@ -80,7 +80,9 @@ class _HomeScreenState extends State<HomeScreen> {
         },
       ),
       floatingActionButton: FloatingActionButton(
-        onPressed: () {},
+        onPressed: () {
+          Navigator.pushNamed(context, '/login');
+        },
         tooltip: 'Increment',
         child: const Icon(Icons.add),
       ),
