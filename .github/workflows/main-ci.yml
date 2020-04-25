@@ -1,0 +1,37 @@
+name: Main CI
+
+on:
+  push:
+    branches: [ master ]
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+    - name: Checkout Sources
+      uses: actions/checkout@v2
+      
+    - name: Run a one-line script
+      run: echo Hello, world!
+
+    - name: Setting up Java
+      uses: actions/setup-java@v1
+      with:
+        java-version: '12.x'
+
+    - name: Setting up Flutter
+      uses: subosito/flutter-action@v1
+      with:
+        channel: 'dev'
+
+    - name: Get dependencies
+      run: flutter pub get
+      
+    - name: Build release APK
+      run: flutter build apk --release
+      
+    - name: Upload artifact
+      uses: actions/upload-artifact@v1.0.0
+      with:
+        name: Release Artifacts
+        path: build/app/outputs/flutter-apk
