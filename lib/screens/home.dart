@@ -94,6 +94,8 @@ class _HomeScreenState extends State<HomeScreen> {
     setState(() {
       _pages = pList.data;
     });
+    await apiInstance.fetchChampions();
+    await apiInstance.fetchRunesInfo();
   }
 
   Future<void> _fetchPackageInfo() async {

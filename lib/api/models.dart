@@ -138,6 +138,67 @@ class PageModel implements Mapable {
   }
 }
 
+class Champion {
+  String uid, name;
+
+  Champion.fromJson(Map<String, dynamic> json) {
+    uid = json['uid'];
+    name = json['name'];
+  }
+}
+
+class Rune {
+  String uid, name, shortDesc, longDesc;
+
+  Rune.fromJson(Map<String, dynamic> json) {
+    uid = json['uid'];
+    name = json['name'];
+    shortDesc = json['shortDesc'];
+    longDesc = json['longDesc'];
+  }
+}
+
+class Slot {
+  List<Rune> runes;
+
+  Slot.fromJson(Map<String, dynamic> json) {
+    if (json['runes'] != null) {
+      runes =
+          (json['runes'] as List).map<Rune>((e) => Rune.fromJson(e)).toList();
+    }
+  }
+}
+
+class Tree {
+  String uid, name;
+  List<Slot> slots;
+
+  Tree.fromJson(Map<String, dynamic> json) {
+    uid = json['uid'];
+    name = json['name'];
+
+    if (json['slots'] != null) {
+      slots = (json['slots'] as List).map((e) => Slot.fromJson(e)).toList();
+    }
+  }
+}
+
+class RunesInfoModel {
+  List<List<String>> perks;
+  List<Tree> trees;
+
+  RunesInfoModel.fromJson(Map<String, dynamic> json) {
+    if (json['perks'] != null) {
+      perks =
+          (json['perks'] as List).map<List<String>>((e) => _asList(e)).toList();
+    }
+
+    if (json['trees'] != null) {
+      trees = (json['trees'] as List).map((e) => Tree.fromJson(e)).toList();
+    }
+  }
+}
+
 List<T> _asList<T>(List<dynamic> list) {
   if (list == null) return List<T>();
   return list.map((e) => e as T).toList();

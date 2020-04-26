@@ -33,6 +33,18 @@ class Picker extends StatelessWidget {
   final List<Widget> value, subset;
   final void Function() onChange;
 
+  Future<void> _openChampSelectDialog(BuildContext context) async {
+    await showDialog(
+        context: context,
+        barrierDismissible: true,
+        builder: (BuildContext context) {
+          return SimpleDialog(
+            title: const Text('Pick champion'),
+            children: subset,
+          );
+        });
+  }
+
   @override
   Widget build(BuildContext context) {
     value.add(
@@ -43,7 +55,9 @@ class Picker extends StatelessWidget {
         ),
         child: IconButton(
           icon: Icon(Icons.add),
-          onPressed: () {},
+          onPressed: () async {
+            await _openChampSelectDialog(context);
+          },
         ),
       ),
     );

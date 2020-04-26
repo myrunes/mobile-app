@@ -6,6 +6,8 @@ import 'package:http/http.dart' as http;
 import 'forms.dart';
 import 'models.dart';
 
+typedef T TransformFunction<T>(dynamic);
+
 const SECURE_STORAGE_TOKEN_KEY = 'myrunes_api_token';
 const COOKIE_TOKEN_KEY = 'jwt_token=';
 
@@ -29,6 +31,9 @@ class API {
   final bool https;
   final String baseURL, prefix;
 
+  ListResponse<Champion> champions;
+  RunesInfoModel runes;
+
   final _storage = FlutterSecureStorage();
 
   Future<String> _getToken() {
@@ -48,7 +53,6 @@ class API {
     };
 
     final token = await _getToken();
-    print('token from store: $token');
     if (token != null && !m.containsKey('cookie')) {
       m['cookie'] = '$token;';
     }
@@ -114,14 +118,27 @@ class API {
   Future<ListResponse<PageModel>> getPages() async {
     final res = await _get('/pages');
     final data = json.decode(res.body);
-    final n = data['n'] ?? 0;
-
-    List<PageModel> d = List();
-
-    if (data['data'] != null) {
-      d = data['data'].map<PageModel>((e) => PageModel.fromJson(e)).toList();
-    }
-
-    return ListResponse(n: n, data: d);
+    return _getList(data, (e) => PageModel.fromJson(e));
   }
+
+  Future<void> fetchChampions() async {
+    final res = await _get('/resources/champions');
+    final data = json.decode(res.body);
+    champions = _getList(data, (e) => Champion.fromJson(e));
+  }
+
+  Future<void> fetchRunesInfo() async {
+    final res = await _get('/resources/runes');
+    final data = json.decode(res.body);
+    runes = RunesInfoModel.fromJson(data);
+  }
+}
+
+ListResponse<T> _getList<T>(Map<String, dynamic> data, TransformFunction tf) {
+  final n = data['n'] ?? 0;
+  List<T> d = [];
+  if (data['data'] != null) {
+    d = (data['data'] as List).map<T>((e) => tf(e)).toList();
+  }
+  return ListResponse(n: n, data: d);
 }
