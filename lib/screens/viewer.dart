@@ -36,8 +36,11 @@ class _PageViewerScreenState extends State<PageViewerScreen> {
               IconButton(
                 icon: Icon(Icons.edit),
                 tooltip: 'Edit page',
-                onPressed: () => Navigator.pushNamed(context, '/pages/edit',
-                    arguments: _page),
+                onPressed: () async {
+                  await Navigator.pushNamed(context, '/pages/edit',
+                      arguments: _page);
+                  this.setState(() {});
+                },
               )
             ])),
         body: _PageViewerScreenContent(_page));

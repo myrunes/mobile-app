@@ -15,6 +15,43 @@ class PageEditorScreen extends StatefulWidget {
       _PageEditorScreenState(this.apiInstance);
 }
 
+class _AppBarTitle extends StatelessWidget {
+  _AppBarTitle(this.apiInstance, this.page);
+
+  final API apiInstance;
+  final PageModel page;
+
+  void _onSavePressed(BuildContext context) async {
+    try {
+      await apiInstance.updatePage(page);
+      Scaffold.of(context).showSnackBar(SnackBar(
+        content: Text('Page updated.'),
+        backgroundColor: Colors.green,
+      ));
+    } catch (err) {
+      Scaffold.of(context).showSnackBar(SnackBar(
+        content: Text(err.toString()),
+        backgroundColor: Colors.red,
+      ));
+    }
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return Row(
+        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+        crossAxisAlignment: CrossAxisAlignment.center,
+        children: [
+          Text('${page.title} (edit)'),
+          IconButton(
+            icon: Icon(Icons.save),
+            tooltip: 'Save page',
+            onPressed: () => _onSavePressed(context),
+          )
+        ]);
+  }
+}
+
 class _PageEditorScreenState extends State<PageEditorScreen> {
   _PageEditorScreenState(this.apiInstance);
 
@@ -26,18 +63,7 @@ class _PageEditorScreenState extends State<PageEditorScreen> {
     _page = ModalRoute.of(context).settings.arguments;
 
     return Scaffold(
-        appBar: AppBar(
-            title: Row(
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                crossAxisAlignment: CrossAxisAlignment.center,
-                children: [
-              Text('${_page.title} (edit)'),
-              IconButton(
-                icon: Icon(Icons.save),
-                tooltip: 'Save page',
-                onPressed: () {},
-              )
-            ])),
+        appBar: AppBar(title: _AppBarTitle(apiInstance, _page)),
         body: _PageEditorScreenContent(
           _page,
           apiInstance,
@@ -65,7 +91,9 @@ class _PageEditorScreenContent extends StatelessWidget {
     final champions = page.champions
         .map<Widget>((c) => PickerElement(
             avatar: AssetImage('assets/champ-avis/$c.png'),
-            label: c,
+            label: apiInstance.champions.data
+                .firstWhere((champ) => champ.uid == c)
+                .name,
             onDelete: () => onChampionRemove(c)))
         .toList();
 

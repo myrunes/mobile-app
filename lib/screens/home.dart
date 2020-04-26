@@ -112,8 +112,9 @@ class _HomeScreenContent extends StatelessWidget {
   final List<PageModel> pages;
   final Future<void> Function() onRefresh;
 
-  void _onPageTileTap(BuildContext context, PageModel page) {
-    Navigator.pushNamed(context, '/pages/view', arguments: page);
+  void _onPageTileTap(BuildContext context, PageModel page) async {
+    await Navigator.pushNamed(context, '/pages/view', arguments: page);
+    onRefresh();
   }
 
   @override

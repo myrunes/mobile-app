@@ -31,8 +31,11 @@ class API {
   final bool https;
   final String baseURL, prefix;
 
-  ListResponse<Champion> champions;
-  RunesInfoModel runes;
+  ListResponse<Champion> _champions;
+  RunesInfoModel _runes;
+
+  ListResponse<Champion> get champions => _champions;
+  RunesInfoModel get runes => _runes;
 
   final _storage = FlutterSecureStorage();
 
@@ -95,6 +98,18 @@ class API {
     return res;
   }
 
+  Future<void> fetchChampions() async {
+    final res = await _get('/resources/champions');
+    final data = json.decode(res.body);
+    _champions = _getList(data, (e) => Champion.fromJson(e));
+  }
+
+  Future<void> fetchRunesInfo() async {
+    final res = await _get('/resources/runes');
+    final data = json.decode(res.body);
+    _runes = RunesInfoModel.fromJson(data);
+  }
+
   Future login(LoginFormModel m) async {
     final res = await _post('/login', body: m);
     final cookieHeader = res.headers['set-cookie'];
@@ -121,16 +136,10 @@ class API {
     return _getList(data, (e) => PageModel.fromJson(e));
   }
 
-  Future<void> fetchChampions() async {
-    final res = await _get('/resources/champions');
+  Future<PageModel> updatePage(PageModel page) async {
+    final res = await _post('/pages/${page.uid}', body: page);
     final data = json.decode(res.body);
-    champions = _getList(data, (e) => Champion.fromJson(e));
-  }
-
-  Future<void> fetchRunesInfo() async {
-    final res = await _get('/resources/runes');
-    final data = json.decode(res.body);
-    runes = RunesInfoModel.fromJson(data);
+    return PageModel.fromJson(data);
   }
 }
 
