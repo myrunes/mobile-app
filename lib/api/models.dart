@@ -199,6 +199,13 @@ class RunesInfoModel {
   }
 }
 
+class ViewerEditorArguments {
+  ViewerEditorArguments({this.page, this.pageList});
+
+  PageModel page;
+  final List<PageModel> pageList;
+}
+
 List<T> _asList<T>(List<dynamic> list) {
   if (list == null) return List<T>();
   return list.map((e) => e as T).toList();

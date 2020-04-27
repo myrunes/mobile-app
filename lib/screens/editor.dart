@@ -15,55 +15,29 @@ class PageEditorScreen extends StatefulWidget {
       _PageEditorScreenState(this.apiInstance);
 }
 
-class _AppBarTitle extends StatelessWidget {
-  _AppBarTitle(this.apiInstance, this.page);
-
-  final API apiInstance;
-  final PageModel page;
-
-  void _onSavePressed(BuildContext context) async {
-    try {
-      await apiInstance.updatePage(page);
-      Scaffold.of(context).showSnackBar(SnackBar(
-        content: Text('Page updated.'),
-        backgroundColor: Colors.green,
-      ));
-    } catch (err) {
-      Scaffold.of(context).showSnackBar(SnackBar(
-        content: Text(err.toString()),
-        backgroundColor: Colors.red,
-      ));
-    }
-  }
-
-  @override
-  Widget build(BuildContext context) {
-    return Row(
-        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-        crossAxisAlignment: CrossAxisAlignment.center,
-        children: [
-          Text('${page.title} (edit)'),
-          IconButton(
-            icon: Icon(Icons.save),
-            tooltip: 'Save page',
-            onPressed: () => _onSavePressed(context),
-          )
-        ]);
-  }
-}
-
 class _PageEditorScreenState extends State<PageEditorScreen> {
   _PageEditorScreenState(this.apiInstance);
 
   final API apiInstance;
+  ViewerEditorArguments _args;
   PageModel _page;
+
+  void onSaved() {
+    _args.page = _page;
+  }
 
   @override
   Widget build(BuildContext context) {
-    _page = ModalRoute.of(context).settings.arguments;
+    if (_args == null) {
+      // Create a deep copy of the currently edited page
+      _args = ModalRoute.of(context).settings.arguments;
+      final original = _args.page?.toMap();
+      _page = PageModel.fromJson(original);
+    }
 
     return Scaffold(
-        appBar: AppBar(title: _AppBarTitle(apiInstance, _page)),
+        appBar:
+            AppBar(title: _AppBarTitle(apiInstance, _page, onSaved: onSaved)),
         body: _PageEditorScreenContent(
           _page,
           apiInstance,
@@ -120,5 +94,44 @@ class _PageEditorScreenContent extends StatelessWidget {
           subset: championsSubset,
           value: champions,
         ));
+  }
+}
+
+class _AppBarTitle extends StatelessWidget {
+  _AppBarTitle(this.apiInstance, this.page, {this.onSaved});
+
+  final API apiInstance;
+  final PageModel page;
+  final void Function() onSaved;
+
+  void _onSavePressed(BuildContext context) async {
+    try {
+      await apiInstance.updatePage(page);
+      onSaved();
+      Scaffold.of(context).showSnackBar(SnackBar(
+        content: Text('Page updated.'),
+        backgroundColor: Colors.green,
+      ));
+    } catch (err) {
+      Scaffold.of(context).showSnackBar(SnackBar(
+        content: Text(err.toString()),
+        backgroundColor: Colors.red,
+      ));
+    }
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return Row(
+        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+        crossAxisAlignment: CrossAxisAlignment.center,
+        children: [
+          Text('${page.title} (edit)'),
+          IconButton(
+            icon: Icon(Icons.save),
+            tooltip: 'Save page',
+            onPressed: () => _onSavePressed(context),
+          )
+        ]);
   }
 }

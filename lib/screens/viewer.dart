@@ -20,11 +20,13 @@ class _PageViewerScreenState extends State<PageViewerScreen> {
   _PageViewerScreenState(this.apiInstance);
 
   final API apiInstance;
-  PageModel _page;
+  ViewerEditorArguments _args;
 
   @override
   Widget build(BuildContext context) {
-    _page = ModalRoute.of(context).settings.arguments;
+    if (_args == null) {
+      _args = ModalRoute.of(context).settings.arguments;
+    }
 
     return Scaffold(
         appBar: AppBar(
@@ -32,18 +34,18 @@ class _PageViewerScreenState extends State<PageViewerScreen> {
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 crossAxisAlignment: CrossAxisAlignment.center,
                 children: [
-              Text(_page.title),
+              Text(_args.page.title),
               IconButton(
                 icon: Icon(Icons.edit),
                 tooltip: 'Edit page',
                 onPressed: () async {
                   await Navigator.pushNamed(context, '/pages/edit',
-                      arguments: _page);
+                      arguments: _args);
                   this.setState(() {});
                 },
               )
             ])),
-        body: _PageViewerScreenContent(_page));
+        body: _PageViewerScreenContent(_args.page));
   }
 }
 
