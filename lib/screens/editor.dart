@@ -4,6 +4,7 @@ import 'package:myrunes/api/api.dart';
 import 'package:myrunes/api/models.dart';
 import 'package:myrunes/widgets/picker.dart';
 import 'package:myrunes/widgets/roundimage.dart';
+import 'package:myrunes/widgets/runepicker.dart';
 
 class PageEditorScreen extends StatefulWidget {
   PageEditorScreen(this.apiInstance);
@@ -36,29 +37,22 @@ class _PageEditorScreenState extends State<PageEditorScreen> {
     }
 
     return Scaffold(
-        appBar:
-            AppBar(title: _AppBarTitle(apiInstance, _page, onSaved: onSaved)),
-        body: _PageEditorScreenContent(
-          _page,
-          apiInstance,
-          onChampionRemove: (c) => setState(() {
-            _page.champions.remove(c);
-          }),
-          onChampionAdd: (c) => setState(() {
-            _page.champions.add(c);
-          }),
-        ));
+      appBar: AppBar(title: _AppBarTitle(apiInstance, _page, onSaved: onSaved)),
+      body: _PageEditorScreenContent(
+        _page,
+        apiInstance,
+        onUpdate: setState,
+      ),
+    );
   }
 }
 
 class _PageEditorScreenContent extends StatelessWidget {
-  _PageEditorScreenContent(this.page, this.apiInstance,
-      {this.onChampionRemove, this.onChampionAdd});
+  _PageEditorScreenContent(this.page, this.apiInstance, {this.onUpdate});
 
   final API apiInstance;
   final PageModel page;
-  final void Function(String champ) onChampionRemove;
-  final void Function(String champ) onChampionAdd;
+  final void Function(void Function()) onUpdate;
 
   @override
   Widget build(BuildContext context) {
@@ -68,7 +62,7 @@ class _PageEditorScreenContent extends StatelessWidget {
             label: apiInstance.champions.data
                 .firstWhere((champ) => champ.uid == c)
                 .name,
-            onDelete: () => onChampionRemove(c)))
+            onDelete: () => onUpdate(() => page.champions.remove(c))))
         .toList();
 
     apiInstance.champions.data.sort((a, b) => a.name.compareTo(b.name));
@@ -83,16 +77,41 @@ class _PageEditorScreenContent extends StatelessWidget {
               title: Text(c.name),
               onTap: () {
                 Navigator.pop(context);
-                onChampionAdd(c.uid);
+                onUpdate(() => page.champions.add(c.uid));
               },
             ))
         .toList();
 
     return Container(
         margin: EdgeInsets.symmetric(vertical: 20, horizontal: 10),
-        child: Picker(
-          subset: championsSubset,
-          value: champions,
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.stretch,
+          children: [
+            Padding(
+              padding: const EdgeInsets.only(bottom: 10),
+              child: TextFormField(
+                decoration: const InputDecoration(
+                  hintText: 'Page title',
+                ),
+                initialValue: page.title,
+                onChanged: (v) => onUpdate(() => page.title = v),
+              ),
+            ),
+            Padding(
+              padding: const EdgeInsets.only(bottom: 20),
+              child: Picker(
+                subset: championsSubset,
+                value: champions,
+              ),
+            ),
+            RunePicker(
+              apiInstance,
+              page.primary,
+              page.secondary,
+              page.perks,
+              onUpdate: () => onUpdate(() {}),
+            )
+          ],
         ));
   }
 }
@@ -113,8 +132,11 @@ class _AppBarTitle extends StatelessWidget {
         backgroundColor: Colors.green,
       ));
     } catch (err) {
+      final errStr = err is APIError
+          ? '${err.reason} (${err.statusCode})'
+          : err.toString();
       Scaffold.of(context).showSnackBar(SnackBar(
-        content: Text(err.toString()),
+        content: Text(errStr),
         backgroundColor: Colors.red,
       ));
     }
