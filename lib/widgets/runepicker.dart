@@ -61,6 +61,9 @@ class RunePicker extends StatelessWidget {
   }
 
   void _onPrimarySelect(int i, Rune r) {
+    if (primary.rows.length < 4) {
+      primary.rows = [null, null, null, null];
+    }
     primary.rows[i] = r.uid;
     onUpdate();
   }

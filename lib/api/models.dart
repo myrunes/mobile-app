@@ -62,7 +62,11 @@ class UserModel implements Mapable {
 }
 
 class TreeModel implements Mapable {
-  TreeModel({this.tree, this.rows});
+  TreeModel({this.tree, this.rows}) {
+    if (rows == null) {
+      rows = [];
+    }
+  }
 
   String tree;
   List<String> rows;
@@ -82,6 +86,12 @@ class TreeModel implements Mapable {
 }
 
 class PerksModel implements Mapable {
+  PerksModel({this.rows}) {
+    if (rows == null) {
+      rows = [];
+    }
+  }
+
   List<String> rows;
 
   PerksModel.fromJson(Map<String, dynamic> json) {
@@ -97,6 +107,13 @@ class PerksModel implements Mapable {
 }
 
 class PageModel implements Mapable {
+  PageModel() {
+    champions = [];
+    primary = TreeModel();
+    secondary = TreeModel();
+    perks = PerksModel();
+  }
+
   String uid;
   String owner;
   String title;
@@ -125,11 +142,11 @@ class PageModel implements Mapable {
   @override
   Map<String, dynamic> toMap() {
     return <String, dynamic>{
-      'uid': uid,
-      'owner': owner,
+      'uid': uid ?? '0',
+      'owner': owner ?? '0',
       'title': title,
-      'created': created.toIso8601String(),
-      'edited': edited.toIso8601String(),
+      'created': created?.toIso8601String(),
+      'edited': edited?.toIso8601String(),
       'champions': champions,
       'primary': primary.toMap(),
       'secondary': secondary.toMap(),
@@ -200,9 +217,10 @@ class RunesInfoModel {
 }
 
 class ViewerEditorArguments {
-  ViewerEditorArguments({this.page, this.pageList});
+  ViewerEditorArguments({this.page, this.pageList, this.isNew = false});
 
   PageModel page;
+  bool isNew;
   final List<PageModel> pageList;
 }
 

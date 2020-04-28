@@ -30,14 +30,19 @@ class _PageEditorScreenState extends State<PageEditorScreen> {
   @override
   Widget build(BuildContext context) {
     if (_args == null) {
-      // Create a deep copy of the currently edited page
       _args = ModalRoute.of(context).settings.arguments;
-      final original = _args.page?.toMap();
-      _page = PageModel.fromJson(original);
+      if (_args.isNew) {
+        _page = PageModel();
+        _args.page = _page;
+      } else {
+        final original = _args.page?.toMap();
+        _page = PageModel.fromJson(original);
+      }
     }
 
     return Scaffold(
-      appBar: AppBar(title: _AppBarTitle(apiInstance, _page, onSaved: onSaved)),
+      appBar: AppBar(
+          title: _AppBarTitle(apiInstance, _page, _args, onSaved: onSaved)),
       body: _PageEditorScreenContent(
         _page,
         apiInstance,
@@ -123,20 +128,30 @@ class _PageEditorScreenContent extends StatelessWidget {
 }
 
 class _AppBarTitle extends StatelessWidget {
-  _AppBarTitle(this.apiInstance, this.page, {this.onSaved});
+  _AppBarTitle(this.apiInstance, this.page, this.args, {this.onSaved});
 
-  final API apiInstance;
   final PageModel page;
+  final API apiInstance;
+  final ViewerEditorArguments args;
   final void Function() onSaved;
 
   void _onSavePressed(BuildContext context) async {
     try {
-      await apiInstance.updatePage(page);
-      onSaved();
-      Scaffold.of(context).showSnackBar(SnackBar(
-        content: Text('Page updated.'),
-        backgroundColor: Colors.green,
-      ));
+      if (args.isNew) {
+        // TODO: Remove this when Perks are settable
+        args.page.perks.rows = ['diamond', 'diamond', 'heart'];
+        args.page = await apiInstance.createPage(page);
+        args.pageList.add(args.page);
+        onSaved();
+        Navigator.pop(context, true);
+      } else {
+        await apiInstance.updatePage(page);
+        onSaved();
+        Scaffold.of(context).showSnackBar(SnackBar(
+          content: Text('Page updated.'),
+          backgroundColor: Colors.green,
+        ));
+      }
     } catch (err) {
       final errStr = err is APIError
           ? '${err.reason} (${err.statusCode})'
@@ -154,7 +169,7 @@ class _AppBarTitle extends StatelessWidget {
         mainAxisAlignment: MainAxisAlignment.spaceBetween,
         crossAxisAlignment: CrossAxisAlignment.center,
         children: [
-          Text('${page.title} (edit)'),
+          Text('${page?.title ?? 'new page'} (edit)'),
           IconButton(
             icon: Icon(Icons.save),
             tooltip: 'Save page',

@@ -141,6 +141,12 @@ class API {
     final data = json.decode(res.body);
     return PageModel.fromJson(data);
   }
+
+  Future<PageModel> createPage(PageModel page) async {
+    final res = await _post('/pages', body: page);
+    final data = json.decode(res.body);
+    return PageModel.fromJson(data);
+  }
 }
 
 ListResponse<T> _getList<T>(Map<String, dynamic> data, TransformFunction tf) {

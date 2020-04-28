@@ -79,12 +79,23 @@ class _HomeScreenState extends State<HomeScreen> {
           await _fetchData();
         },
       ),
-      floatingActionButton: FloatingActionButton(
-        onPressed: () {
-          Navigator.pushNamed(context, '/login');
-        },
-        tooltip: 'Increment',
-        child: const Icon(Icons.add),
+      floatingActionButton: Builder(
+        builder: (BuildContext context) => FloatingActionButton(
+          onPressed: () async {
+            final created = await Navigator.pushNamed(context, '/pages/edit',
+                arguments:
+                    ViewerEditorArguments(pageList: _pages, isNew: true));
+            if (created as bool) {
+              Scaffold.of(context).showSnackBar(SnackBar(
+                content: Text('Page created.'),
+                backgroundColor: Colors.green,
+              ));
+            }
+            this.setState(() {});
+          },
+          tooltip: 'Increment',
+          child: const Icon(Icons.add),
+        ),
       ),
     );
   }

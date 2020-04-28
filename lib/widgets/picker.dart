@@ -47,21 +47,21 @@ class Picker extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    value.add(
-      Ink(
-        decoration: const ShapeDecoration(
-          color: Color.fromRGBO(255, 255, 255, 0.1),
-          shape: CircleBorder(),
-        ),
-        child: IconButton(
-          icon: Icon(Icons.add),
-          onPressed: () async {
-            await _openChampSelectDialog(context);
-          },
-        ),
+    final List<Widget> widgets = [];
+    widgets.addAll(value);
+    widgets.add(Ink(
+      decoration: const ShapeDecoration(
+        color: Color.fromRGBO(255, 255, 255, 0.1),
+        shape: CircleBorder(),
       ),
-    );
+      child: IconButton(
+        icon: Icon(Icons.add),
+        onPressed: () async {
+          await _openChampSelectDialog(context);
+        },
+      ),
+    ));
 
-    return Wrap(children: value);
+    return Wrap(children: widgets);
   }
 }
