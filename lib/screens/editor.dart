@@ -82,37 +82,43 @@ class _PageEditorScreenContent extends StatelessWidget {
             ))
         .toList();
 
-    return Container(
-        margin: EdgeInsets.symmetric(vertical: 20, horizontal: 10),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.stretch,
-          children: [
-            Padding(
-              padding: const EdgeInsets.only(bottom: 10),
-              child: TextFormField(
-                decoration: const InputDecoration(
-                  hintText: 'Page title',
-                ),
-                initialValue: page.title,
-                onChanged: (v) => onUpdate(() => page.title = v),
-              ),
-            ),
-            Padding(
-              padding: const EdgeInsets.only(bottom: 20),
-              child: Picker(
-                subset: championsSubset,
-                value: champions,
-              ),
-            ),
-            RunePicker(
-              apiInstance,
-              page.primary,
-              page.secondary,
-              page.perks,
-              onUpdate: () => onUpdate(() {}),
-            )
-          ],
-        ));
+    return LayoutBuilder(
+        builder: (BuildContext context, BoxConstraints viewportConstraints) {
+      return SingleChildScrollView(
+          padding: EdgeInsets.all(10),
+          child: ConstrainedBox(
+              constraints:
+                  BoxConstraints(minHeight: viewportConstraints.maxHeight),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.stretch,
+                children: [
+                  Padding(
+                    padding: const EdgeInsets.only(bottom: 10),
+                    child: TextFormField(
+                      decoration: const InputDecoration(
+                        hintText: 'Page title',
+                      ),
+                      initialValue: page.title,
+                      onChanged: (v) => onUpdate(() => page.title = v),
+                    ),
+                  ),
+                  Padding(
+                    padding: const EdgeInsets.only(bottom: 20),
+                    child: Picker(
+                      subset: championsSubset,
+                      value: champions,
+                    ),
+                  ),
+                  RunePicker(
+                    apiInstance,
+                    page.primary,
+                    page.secondary,
+                    page.perks,
+                    onUpdate: () => onUpdate(() {}),
+                  )
+                ],
+              )));
+    });
   }
 }
 
