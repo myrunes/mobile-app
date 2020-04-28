@@ -42,6 +42,51 @@ class RunePicker extends StatelessWidget {
     onUpdate();
   }
 
+  int _getSecRow(String runeUID) {
+    final runes = apiInstance.runes.trees
+        .firstWhere((t) => t.uid == secondary.tree)
+        .slots
+        .sublist(1)
+        .toList();
+
+    var i = 0;
+    for (final slot in runes) {
+      if (slot.runes.where((r) => r.uid == runeUID).length > 0) {
+        return i;
+      }
+      i++;
+    }
+
+    return -1;
+  }
+
+  void _onPrimarySelect(int i, Rune r) {
+    primary.rows[i] = r.uid;
+    onUpdate();
+  }
+
+  void _onSecondarySelect(int i, Rune r) {
+    if (secondary.rows.length < 2) {
+      secondary.rows = [null, null];
+    }
+
+    if (_getSecRow(r.uid) == _getSecRow(secondary.rows[0])) {
+      secondary.rows[0] = r.uid;
+      return onUpdate();
+    }
+
+    if (secondary.rows[0] != null && secondary.rows[1] != null) {
+      secondary.rows[1] = secondary.rows[0];
+      secondary.rows[0] = r.uid;
+    } else if (secondary.rows[0] != null) {
+      secondary.rows[1] = r.uid;
+    } else {
+      secondary.rows[0] = r.uid;
+    }
+
+    onUpdate();
+  }
+
   @override
   Widget build(BuildContext context) {
     final treePickerElements = apiInstance.runes.trees
@@ -68,8 +113,9 @@ class RunePicker extends StatelessWidget {
     if (primary.tree != null) {
       for (var i = 0; i < 4; i++) {
         primaryElements.add(_PrimaryRuneRow(
-            primary,
-            apiInstance.runes.trees
+            tree: primary,
+            onSelect: (r) => _onPrimarySelect(i, r),
+            runes: apiInstance.runes.trees
                 .firstWhere((t) => t.uid == primary.tree)
                 ?.slots[i]
                 ?.runes));
@@ -89,8 +135,9 @@ class RunePicker extends StatelessWidget {
     if (secondary.tree != null) {
       for (var i = 1; i < 4; i++) {
         secondaryElements.add(_PrimaryRuneRow(
-            secondary,
-            apiInstance.runes.trees
+            tree: secondary,
+            onSelect: (r) => _onSecondarySelect(i, r),
+            runes: apiInstance.runes.trees
                 .firstWhere((t) => t.uid == secondary.tree)
                 ?.slots[i]
                 ?.runes));
@@ -144,7 +191,8 @@ class RunePicker extends StatelessWidget {
 }
 
 class _PrimaryRuneRow extends StatelessWidget {
-  _PrimaryRuneRow(this.tree, this.runes, {@required this.onSelect});
+  _PrimaryRuneRow(
+      {@required this.tree, @required this.runes, @required this.onSelect});
 
   final TreeModel tree;
   final List<Rune> runes;
