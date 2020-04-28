@@ -35,3 +35,11 @@ jobs:
       with:
         name: Release Artifacts
         path: build/app/outputs/flutter-apk
+
+    - name: Deploy APK to myrunes DL server
+      run: |
+        gpg --batch --yes --passphrase="${{ secrets.SSH_KEY_PASSPHRASE }}" -o ssh_key.pem -d key.pem.gpg
+        chmod 0700 ssh_key.pem
+        mkdir ~/.ssh
+        ssh-keyscan -t rsa myrunes.com >> ~/.ssh/known_hosts
+        scp -i ssh_key.pem build/app/outputs/flutter-apk/app-release.apk myrunespush@myrunes.com:/var/www/html/files/myrunes/download/beta-app.apk
