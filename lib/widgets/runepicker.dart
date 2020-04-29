@@ -2,6 +2,7 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:myrunes/api/api.dart';
 import 'package:myrunes/api/models.dart';
+import 'package:myrunes/widgets/perkrow.dart';
 
 class RunePicker extends StatelessWidget {
   RunePicker(this.apiInstance, this.primary, this.secondary, this.perks,
@@ -90,6 +91,15 @@ class RunePicker extends StatelessWidget {
     onUpdate();
   }
 
+  void _onPerkSelect(int i, String p) {
+    if (perks.rows.length < 3) {
+      perks.rows = [null, null, null];
+    }
+
+    perks.rows[i] = p;
+    onUpdate();
+  }
+
   @override
   Widget build(BuildContext context) {
     final treePickerElements = apiInstance.runes.trees
@@ -102,6 +112,7 @@ class RunePicker extends StatelessWidget {
 
     final List<Widget> primaryElements = [];
     final List<Widget> secondaryElements = [];
+    final List<Widget> perkElements = [];
 
     // Primary Header
     primaryElements.add(Padding(
@@ -147,6 +158,27 @@ class RunePicker extends StatelessWidget {
       }
     }
 
+    // Perks Header
+    perkElements.add(Padding(
+      padding: const EdgeInsets.only(bottom: 8.0),
+      child: const Text(
+        'Perks',
+        style: TextStyle(fontSize: 16),
+      ),
+    ));
+
+    // Perks Runes
+    if (perks.rows != null) {
+      for (var i = 0; i < 3; i++) {
+        perkElements.add(_PerkRow(
+          row: i,
+          perks: apiInstance.runes.perks[i],
+          perksModel: perks,
+          onSelect: (p) => _onPerkSelect(i, p),
+        ));
+      }
+    }
+
     return SingleChildScrollView(
       child: Column(children: [
         // Tree Picker
@@ -159,7 +191,7 @@ class RunePicker extends StatelessWidget {
         ),
         // Primary Tree Picker
         Container(
-          margin: EdgeInsets.only(bottom: 10),
+          margin: const EdgeInsets.only(bottom: 10),
           decoration: BoxDecoration(
               borderRadius: BorderRadius.circular(5),
               color: Color.fromRGBO(255, 255, 255, 0.1)),
@@ -175,6 +207,7 @@ class RunePicker extends StatelessWidget {
         ),
         // Secondary Tree Picker
         Container(
+          margin: const EdgeInsets.only(bottom: 10),
           decoration: BoxDecoration(
               borderRadius: BorderRadius.circular(5),
               color: Color.fromRGBO(255, 255, 255, 0.1)),
@@ -187,6 +220,19 @@ class RunePicker extends StatelessWidget {
                   ),
                 )
               : null,
+        ),
+        // Perks Picker
+        Container(
+          decoration: BoxDecoration(
+              borderRadius: BorderRadius.circular(5),
+              color: Color.fromRGBO(255, 255, 255, 0.1)),
+          child: Padding(
+            padding: const EdgeInsets.all(8.0),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: perkElements,
+            ),
+          ),
         )
       ]),
     );
@@ -216,18 +262,48 @@ class _PrimaryRuneRow extends StatelessWidget {
   }
 }
 
+class _PerkRow extends StatelessWidget {
+  _PerkRow(
+      {@required this.perksModel,
+      @required this.row,
+      @required this.perks,
+      @required this.onSelect});
+
+  final PerksModel perksModel;
+  final int row;
+  final List<String> perks;
+  final void Function(String) onSelect;
+
+  @override
+  Widget build(BuildContext context) {
+    final elements = perks
+        .map((p) => _Selector(
+              image: AssetImage('assets/rune-avis/perks/$p.png'),
+              enabled: perksModel.rows.length >= 3 && perksModel.rows[row] == p,
+              onTap: () => onSelect(p),
+              padding: EdgeInsets.fromLTRB(0, 0, 8, 8),
+              perk: p,
+            ))
+        .toList();
+
+    return Row(children: elements);
+  }
+}
+
 class _Selector extends StatelessWidget {
   _Selector(
       {@required this.image,
       @required this.onTap,
       this.enabled = false,
       this.size = 40,
-      this.padding});
+      this.padding,
+      this.perk});
 
   final ImageProvider image;
   final bool enabled;
   final double size;
   final EdgeInsets padding;
+  final String perk;
   final void Function() onTap;
 
   @override
@@ -242,7 +318,9 @@ class _Selector extends StatelessWidget {
             margin: padding,
             decoration: BoxDecoration(
                 shape: BoxShape.circle,
-                image: DecorationImage(image: image),
+                image:
+                    DecorationImage(image: image, scale: perk != null ? 10 : 1),
+                color: perk != null ? perkColor(perk) : null,
                 border: Border.all(
                     color: enabled ? Colors.cyan : Colors.transparent,
                     width: 2)),

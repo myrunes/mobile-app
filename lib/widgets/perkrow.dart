@@ -50,7 +50,7 @@ class _PerkImage extends StatelessWidget {
       margin: margin,
       decoration: BoxDecoration(
           shape: BoxShape.circle,
-          color: _perkColor(perk),
+          color: perkColor(perk),
           image: DecorationImage(
             scale: 6,
             image: AssetImage('assets/rune-avis/perks/$perk.png'),
@@ -59,7 +59,7 @@ class _PerkImage extends StatelessWidget {
   }
 }
 
-Color _perkColor(String perk) {
+Color perkColor(String perk) {
   switch (perk) {
     case 'axe':
       return Color.fromRGBO(255, 193, 7, 0.3);
